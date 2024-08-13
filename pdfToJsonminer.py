@@ -1,12 +1,10 @@
-import PyPDF2  # Librería para trabajar con archivos PDF
 import json   # Librería para trabajar con datos en formato JSON
 import re     # Librería para trabajar con expresiones regulares
+from pdfminer.high_level import extract_text # Librería para trabajar con PDF miner
 
 # Función para extraer texto de un archivo PDF
 def extract_text_from_pdf(pdf_path):
-    pdf_file = open(pdf_path, 'rb')
-    pdf_reader = PyPDF2.PdfReader(pdf_file)
-    return pdf_reader, pdf_file
+    return extract_text(pdf_path)
 
 # Función para analizar el texto de una página
 def parse_page(page_text):
@@ -18,6 +16,8 @@ def parse_page(page_text):
         'telefono': '',
         'comprador': '',
         'fax_comprador': '',
+        'total': '',
+        
     }
     
     # Patrón para encontrar el orden de compra (solo los números)
@@ -30,16 +30,19 @@ def parse_page(page_text):
     ciudad_pattern = r'Ciudad\s*:\s*([^\n\r]+)'
     
     # Ejemplo de patrón para encontrar la direccion
-    direccion_pattern = r'Dirección\s*:\s*([^\n\r]+)(?=\s*Teléfono\s*:|$)'#(?=\s*Teléfono\s*:|$)
+    direccion_pattern = r'Dirección\s*:\s*([^\n\r]+)'
     
     # Ejemplo de patrón para encontrar el teléfono
     telefono_pattern = r'Teléfono\s*:\s*([^\n\r]+)'
     
     # Patrón para encontrar el comprador hasta la palabra "Fax"
-    comprador_pattern = r'Comprador\s*:\s*([^\n\r]+)'#(?=\s*Fax\s*:|$)
-
+    comprador_pattern = r'Comprador\s*:\s*([^\n\r]+)'
+    
     # Patrón para encontrar el fax
     fax_comprador_pattern = r'Fax\s*:\s*([^\n\r]+)'
+    
+    # Patrón para encontrar el fax
+    total_pattern = r'Total\s*Impuestos\s*([^\n\r]+)'
 
 
     # Buscar el patrón de orden de compra
@@ -96,6 +99,12 @@ def parse_page(page_text):
     else:
         print("No se encontró una direccion válido en la página.")
     
+    total_match = re.search(total_pattern, page_text, re.IGNORECASE)
+    if total_match:
+        data['total'] = total_match.group(1).strip()
+    else:
+        print("No se encontró una direccion válido en la página.")
+    
     return data
 
 # Función para convertir la información de cada página en formato JSON
@@ -104,19 +113,18 @@ def convert_pages_to_json(pages_data):
 
 # Cambia esta ruta a la ubicación de tu archivo PDF
 pdf_path = 'ordenCompra.pdf'
-pdf_reader, pdf_file = extract_text_from_pdf(pdf_path)
+text = extract_text_from_pdf(pdf_path)
 
 pages_data = []
-for page_num in range(len(pdf_reader.pages)):
-    page = pdf_reader.pages[page_num]
-    page_text = page.extract_text()
-    if page_text:
+
+# Dividir el texto en páginas (pdfminer extrae todo el texto junto)
+pages = text.split('\f')
+for page_num, page_text in enumerate(pages):
+    if page_text.strip():
         page_data = parse_page(page_text)
         pages_data.append(page_data)
     else:
         print(f"No se pudo extraer texto de la página {page_num + 1}")
-
-pdf_file.close()  # Cerrar el archivo después de leer todas las páginas
 
 json_data = convert_pages_to_json(pages_data)
 

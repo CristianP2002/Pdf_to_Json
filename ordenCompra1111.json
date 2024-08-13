@@ -1,0 +1,38 @@
+[
+    {
+        "orden_compra": "4623404112",
+        "nit": "890107487",
+        "ciudad": "BARRANQUILLA",
+        "direccion": "Cra. 36 con 14",
+        "telefono": "3710891 Ext: 891",
+        "comprador": "Super Tiendas Olimpica",
+        "fax_comprador": "3710372",
+        "total": "458,850",
+        "descripcion": [
+            {
+                "articulo": "Producto 1",
+                "descripcion": "Articulo 1 de la orden",
+                "precio": "1,000",
+                "cantidad": "10",
+                "total": "10,000"
+            },
+            {
+                "articulo": "Producto 2",
+                "descripcion": "Articulo 2 de la orden",
+                "precio": "2,000",
+                "cantidad": "5",
+                "total": "10,000"
+            }
+        ]
+    },
+    {
+        "orden_compra": "4623394793",
+        "nit": "890107487",
+        "ciudad": "BARRANQUILLA",
+        "direccion": "Cra. 36 con 14",
+        "telefono": "3710891 Ext: 891",
+        "comprador": "Super Tiendas Olimpica",
+        "fax_comprador": "3710372",
+        "total": "41,476.93"
+    }
+]
